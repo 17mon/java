@@ -30,8 +30,7 @@ class IP {
     public static void load(String filename) {
         ipFile = new File(filename);
         load();
-        if (enableFileWatch)
-        {
+        if (enableFileWatch) {
             watch();
         }
     }

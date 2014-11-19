@@ -80,11 +80,6 @@ public class IPExt {
     private static void load() {
         lock.lock();
         lastModifyTime = ipFile.lastModified();
-        if (dataBuffer != null && dataBuffer.position() > 0) {
-            dataBuffer.clear();
-            indexBuffer.clear();
-        }
-
         dataBuffer = ByteBuffer.wrap(getBytesByFile(ipFile));
         dataBuffer.position(0);
         offset = dataBuffer.getInt(); // indexLength
