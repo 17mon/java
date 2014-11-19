@@ -57,10 +57,13 @@ public class IPExt {
         byte[] areaBytes;
 
         lock.lock();
-        dataBuffer.position(offset + (int) index_offset - 262144);
-        areaBytes = new byte[index_length];
-        dataBuffer.get(areaBytes, 0, index_length);
-        lock.unlock();
+        try {
+            dataBuffer.position(offset + (int) index_offset - 262144);
+            areaBytes = new byte[index_length];
+            dataBuffer.get(areaBytes, 0, index_length);
+        } finally {
+            lock.unlock();
+        }
 
         return new String(areaBytes).split("\t");
     }
@@ -78,23 +81,26 @@ public class IPExt {
     }
 
     private static void load() {
-        lock.lock();
         lastModifyTime = ipFile.lastModified();
-        dataBuffer = ByteBuffer.wrap(getBytesByFile(ipFile));
-        dataBuffer.position(0);
-        offset = dataBuffer.getInt(); // indexLength
-        byte[] indexBytes = new byte[offset];
-        dataBuffer.get(indexBytes, 0, offset - 4);
-        indexBuffer = ByteBuffer.wrap(indexBytes);
-        indexBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        lock.lock();
+        try {
+            dataBuffer = ByteBuffer.wrap(getBytesByFile(ipFile));
+            dataBuffer.position(0);
+            offset = dataBuffer.getInt(); // indexLength
+            byte[] indexBytes = new byte[offset];
+            dataBuffer.get(indexBytes, 0, offset - 4);
+            indexBuffer = ByteBuffer.wrap(indexBytes);
+            indexBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
-        for (int i = 0; i < 256; i++) {
-            for (int j = 0; j < 256; j++) {
-                index[i * 256 + j] = indexBuffer.getInt();
+            for (int i = 0; i < 256; i++) {
+                for (int j = 0; j < 256; j++) {
+                    index[i * 256 + j] = indexBuffer.getInt();
+                }
             }
+            indexBuffer.order(ByteOrder.BIG_ENDIAN);
+        } finally {
+            lock.unlock();
         }
-        indexBuffer.order(ByteOrder.BIG_ENDIAN);
-        lock.unlock();
     }
 
     private static byte[] getBytesByFile(File file) {

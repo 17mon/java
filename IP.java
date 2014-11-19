@@ -51,21 +51,23 @@ class IP {
             }
         }
 
+        byte[] areaBytes;
         lock.lock();
-        dataBuffer.position(offset + (int) index_offset - 1024);
-        byte[] areaBytes = new byte[index_length];
-        dataBuffer.get(areaBytes, 0, index_length);
-        lock.unlock();
+        try {
+            dataBuffer.position(offset + (int) index_offset - 1024);
+            areaBytes = new byte[index_length];
+            dataBuffer.get(areaBytes, 0, index_length);
+        } finally {
+            lock.unlock();
+        }
 
         return new String(areaBytes).split("\t");
     }
 
     private static void watch() {
-
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-
                 long time = ipFile.lastModified();
                 if (time > lastModifyTime) {
                     lastModifyTime = time;
@@ -78,10 +80,9 @@ class IP {
     private static void load() {
         lastModifyTime = ipFile.lastModified();
         FileInputStream fin = null;
+        lock.lock();
         try {
-            lock.lock();
-            final int fileLength = Long.valueOf(ipFile.length()).intValue();
-            dataBuffer = ByteBuffer.allocate(fileLength);
+            dataBuffer = ByteBuffer.allocate(Long.valueOf(ipFile.length()).intValue());
             fin = new FileInputStream(ipFile);
             int readBytesLength;
             byte[] chunk = new byte[4096];
@@ -103,13 +104,13 @@ class IP {
             }
             indexBuffer.order(ByteOrder.BIG_ENDIAN);
         } catch (IOException ioe) {
+
         } finally {
             try {
                 if (fin != null) {
                     fin.close();
                 }
-            } catch (IOException e){
-            }
+            } catch (IOException e){}
             lock.unlock();
         }
     }
