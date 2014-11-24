@@ -14,4 +14,4 @@ IP.find("8.8.8.8");//返回字符串数组["GOOGLE","GOOGLE"]
 
 ```
 
-IPExt的用户与IP的用法相同，只是用来解析datx格式文件。
+IPExt的用法与IP的用法相同，只是用来解析datx格式文件。
