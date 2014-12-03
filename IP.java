@@ -1,5 +1,3 @@
-package Tool.ip;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,8 +16,8 @@ class IP
 	public static void main(String[] args)
 	{
 		IP.load("/Users/Neo/Desktop/17monipdb.dat");
-		System.out.println("find:"+Arrays.toString(IP.find("1.191.183.252")));
-		System.out.println("find2:"+Arrays.toString(IP.find2("1.191.183.252")));
+		System.out.println("find:"+Arrays.toString(IP.find("213.255.193.25")));
+		System.out.println("find2:"+Arrays.toString(IP.find2("213.255.193.25")));
 	}
 
 	public static boolean enableFileWatch = false;
@@ -169,17 +167,24 @@ class IP
 				ipb.endip = startipl;
 				ipb.area = new String(areaBytes).split("\t");
 				
-				iplist.add(ipb);
-				
 				if (lastip != null)
-				{
-					ipb.startip = lastip.endip+1;
+				{					
+					if (Arrays.equals(ipb.area, lastip.area))
+					{
+						lastip.endip = ipb.endip;
+					}
+					else
+					{
+						ipb.startip = lastip.endip+1;
+						iplist.add(ipb);
+						lastip = ipb;
+					}
 				}
 				else
 				{
 					ipb.startip = 0;
+					lastip = ipb;
 				}
-				lastip = ipb;
 			}
 			finally
 			{
