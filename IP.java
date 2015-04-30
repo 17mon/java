@@ -4,17 +4,40 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.nio.charset.Charset;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 class IP {
 
+    public static String randomIp() {
+        Random r = new Random();
+        StringBuffer str = new StringBuffer();
+        str.append(r.nextInt(1000000) % 255);
+        str.append(".");
+        str.append(r.nextInt(1000000) % 255);
+        str.append(".");
+        str.append(r.nextInt(1000000) % 255);
+        str.append(".");
+        str.append(0);
+
+        return str.toString();
+    }
+
     public static void main(String[] args){
         IP.load("H:\\loveapp\\codebase\\17mon\\17monipdb.dat");
 
-        System.out.println(Arrays.toString(IP.find("8.8.8.8")));
-        System.out.println(Arrays.toString(IP.find("255.255.255.255")));
+        Long st = System.nanoTime();
+        for (int i = 0; i < 1000000; i++)
+        {
+            IP.find(randomIp());
+        }
+        Long et = System.nanoTime();
+        System.out.println((et - st) / 1000 / 1000);
+
+        System.out.println(Arrays.toString(IP.find("118.28.8.8")));
     }
 
     public static boolean enableFileWatch = false;
@@ -52,6 +75,7 @@ class IP {
         }
 
         byte[] areaBytes;
+
         lock.lock();
         try {
             dataBuffer.position(offset + (int) index_offset - 1024);
@@ -61,7 +85,7 @@ class IP {
             lock.unlock();
         }
 
-        return new String(areaBytes).split("\t");
+        return new String(areaBytes, Charset.forName("UTF-8")).split("\t");
     }
 
     private static void watch() {
@@ -104,13 +128,15 @@ class IP {
             }
             indexBuffer.order(ByteOrder.BIG_ENDIAN);
         } catch (IOException ioe) {
-
+            ioe.printStackTrace();
         } finally {
             try {
                 if (fin != null) {
                     fin.close();
                 }
-            } catch (IOException e){}
+            } catch (IOException e){
+                e.printStackTrace();
+            }
             lock.unlock();
         }
     }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -65,7 +66,7 @@ public class IPExt {
             lock.unlock();
         }
 
-        return new String(areaBytes).split("\t");
+        return new String(areaBytes, Charset.forName("UTF-8")).split("\t");
     }
 
     private static void watch() {
