@@ -85,7 +85,7 @@ class IP {
             lock.unlock();
         }
 
-        return new String(areaBytes, Charset.forName("UTF-8")).split("\t");
+        return new String(areaBytes, Charset.forName("UTF-8")).split("\t"， -1);
     }
 
     private static void watch() {
