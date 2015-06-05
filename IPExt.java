@@ -35,6 +35,20 @@ public class IPExt {
             watch();
         }
     }
+    
+    public static void load(String filename, boolean strict) throws Exception {
+        ipFile = new File(filename);
+        if (strict) {
+            int contentLength = Long.valueOf(ipFile.length()).intValue();
+            if (contentLength < 512 * 1024) {
+                throw new Exception("ip data file error.");
+            }
+        }
+        load();
+        if (enableFileWatch) {
+            watch();
+        }
+    }
 
     public static String[] find(String ip) {
         String[] ips = ip.split("\\.");
