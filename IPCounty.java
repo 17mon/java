@@ -89,7 +89,7 @@ public class IPCounty {
         int index_length = -1;
         byte b = 0;
         for (start = start * 12 + 1024; start < max_comp_len; start += 12) {
-            if (indexBuffer.getInt(start) <= ip2long_value) {
+            if (int2long(indexBuffer.getInt(start)) <= ip2long_value) {
                 if (int2long(indexBuffer.getInt(start + 4)) >= ip2long_value) {
                     index_offset = bytesToLong(b, indexBuffer.get(start + 10), indexBuffer.get(start + 9), indexBuffer.get(start + 8));
                     index_length = 0xFF & indexBuffer.get(start + 11);
