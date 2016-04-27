@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -72,6 +73,26 @@ class IP {
         }
     }
 
+    private static int quickFindInIndexBuffer(long ip2long_value, int start, int end) {
+        int middle = (start + end) / 2;
+        middle = middle & 0xFFFFFFF8;
+        if (middle <= start) return end;
+        long middleValue = int2long(indexBuffer.getInt(middle));
+        if (middleValue == ip2long_value) {
+            return middle;
+        } else if (middleValue > ip2long_value) {
+            if (middle + 8 == end) {
+                return middle;
+            }
+            return quickFindInIndexBuffer(ip2long_value, start, middle);
+        } else {
+            if (middle + 8 == end) {
+                return end;
+            }
+            return quickFindInIndexBuffer(ip2long_value, middle, end);
+        }
+    }
+
     public static String[] find(String ip) {
         int ip_prefix_value = new Integer(ip.substring(0, ip.indexOf(".")));
         long ip2long_value  = ip2long(ip);
@@ -80,13 +101,15 @@ class IP {
         long index_offset = -1;
         int index_length = -1;
         byte b = 0;
-        for (start = start * 8 + 1024; start < max_comp_len; start += 8) {
-            if (int2long(indexBuffer.getInt(start)) >= ip2long_value) {
-                index_offset = bytesToLong(b, indexBuffer.get(start + 6), indexBuffer.get(start + 5), indexBuffer.get(start + 4));
-                index_length = 0xFF & indexBuffer.get(start + 7);
-                break;
-            }
+
+        int index = start * 8 + 1024;
+        if (int2long(indexBuffer.getInt(index)) < ip2long_value) {
+            index = quickFindInIndexBuffer(ip2long_value, index, max_comp_len);
         }
+        index_offset = bytesToLong(b, indexBuffer.get(index + 6), indexBuffer.get(index + 5), indexBuffer.get(index + 4));
+        index_length = 0xFF & indexBuffer.get(index + 7);
+        if (index_length <= 0)
+            return new String[0];
 
         byte[] areaBytes;
 
@@ -160,13 +183,15 @@ class IP {
     }
 
     private static int str2Ip(String ip)  {
-        String[] ss = ip.split("\\.");
-        int a, b, c, d;
-        a = Integer.parseInt(ss[0]);
-        b = Integer.parseInt(ss[1]);
-        c = Integer.parseInt(ss[2]);
-        d = Integer.parseInt(ss[3]);
-        return (a << 24) | (b << 16) | (c << 8) | d;
+        try {
+            byte[] bytes = java.net.InetAddress.getByName(ip).getAddress();
+
+            return ((bytes[0] & 0xFF) << 24) |
+                    ((bytes[1] & 0xFF) << 16) |
+                    ((bytes[2] & 0xFF) << 8) |
+                    bytes[3];
+        } catch (UnknownHostException e) {}
+        return 0;
     }
 
     private static long ip2long(String ip)  {
