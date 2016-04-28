@@ -74,30 +74,35 @@ class IP {
     }
 
     private static int quickFindInIndexBuffer(long ip2long_value, int start, int end) {
-        int middle = (start + end) / 2;
-        middle = middle & 0xFFFFFFF8;
-        if (middle <= start) return end;
-        long middleValue = int2long(indexBuffer.getInt(middle));
-        if (middleValue == ip2long_value) {
-            return middle;
-        } else if (middleValue > ip2long_value) {
-            if (middle + 8 == end) {
+        while(true){
+            int middle = (start + end) / 2;
+            middle = middle & 0xFFFFFFF8;
+            if (middle <= start) return end;
+            long middleValue = int2long(indexBuffer.getInt(middle));
+            if (middleValue == ip2long_value) {
                 return middle;
+            } else if (middleValue > ip2long_value) {
+                if (middle + 8 == end) {
+                    return middle;
+                }
+                end = middle;
+            } else {
+                if (middle + 8 == end) {
+                    return end;
+                }
+                start = middle;
             }
-            return quickFindInIndexBuffer(ip2long_value, start, middle);
-        } else {
-            if (middle + 8 == end) {
-                return end;
-            }
-            return quickFindInIndexBuffer(ip2long_value, middle, end);
         }
     }
 
     public static String[] find(String ip) {
-        int ip_prefix_value = new Integer(ip.substring(0, ip.indexOf(".")));
         long ip2long_value  = ip2long(ip);
+        int ip_prefix_value = ((int)ip2long_value >> 24) & 0xFF;
         int start = index[ip_prefix_value];
         int max_comp_len = offset - 1028;
+        if(ip_prefix_value < index.length-1) {
+          max_comp_len = index[ip_prefix_value+1] * 8 + 1024;
+        }
         long index_offset = -1;
         int index_length = -1;
         byte b = 0;

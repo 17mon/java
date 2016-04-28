@@ -22,6 +22,7 @@ class TestMain {
       for(int i=0; i<testSize; i++){
         ips[i] = IP.randomIp();
       }
+      System.out.println("ip random completed");
       
       
       // check that the return value of new implement and old implement are the same
