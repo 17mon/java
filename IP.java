@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -188,15 +187,13 @@ class IP {
     }
 
     private static int str2Ip(String ip)  {
-        try {
-            byte[] bytes = java.net.InetAddress.getByName(ip).getAddress();
-
-            return ((bytes[0] & 0xFF) << 24) |
-                    ((bytes[1] & 0xFF) << 16) |
-                    ((bytes[2] & 0xFF) << 8) |
-                    bytes[3];
-        } catch (UnknownHostException e) {}
-        return 0;
+        String[] ss = ip.split("\\.");
+        int a, b, c, d;
+        a = Integer.parseInt(ss[0]);
+        b = Integer.parseInt(ss[1]);
+        c = Integer.parseInt(ss[2]);
+        d = Integer.parseInt(ss[3]);
+        return (a << 24) | (b << 16) | (c << 8) | d;
     }
 
     private static long ip2long(String ip)  {

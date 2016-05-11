@@ -22,6 +22,10 @@ class TestMain {
       for(int i=0; i<testSize; i++){
         ips[i] = IP.randomIp();
       }
+      ips[0] = "119.147.158.186";
+      ips[1] = "223.136.200.228";
+      ips[2] = "68.104.105.223";
+      ips[3] = "1.64.29.228";
       System.out.println("ip random completed");
       
       
