@@ -20,7 +20,7 @@ public class IPCounty {
     }
 
     public static void main(String[] args) throws Exception {
-        load("C:\\lovebizhi\\tiantexin\\framework\\library\\ip\\quxian.dat");
+        load("C:\\lovebizh\\tiantexin\\framework\\library\\ip\\quxian.dat");
         System.out.println(Arrays.toString(find("222.180.195.194")));
         Long st = System.nanoTime();
         for (int i = 0; i < 10000; i++)
