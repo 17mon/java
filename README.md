@@ -20,5 +20,5 @@ IPExt的用法与IP的用法相同，只是用来解析datx格式文件。
 ```java
 IP.java 类仅适用于免费版dat与收费版每周每日版本的dat文件；
 IPExt.java 类适用于收费版每日版本的datx文件；
-IPCounty.java 类适用于区县库datx文件；
 ```
+区县库代码请查看 https://github.com/17mon/quxianku/
