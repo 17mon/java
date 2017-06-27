@@ -3,8 +3,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -171,7 +171,6 @@ class IP {
         int num = 0;
         // 点号间256进制
         int offset = 24;
-        // ip包含点的个数
         for (int i = 0; i < len; i++) {
             char c = ip.charAt(i);
             switch (c) {
