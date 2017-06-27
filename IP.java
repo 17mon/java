@@ -160,13 +160,49 @@ class IP {
     }
 
     private static int str2Ip(String ip)  {
-        String[] ss = ip.split("\\.");
-        int a, b, c, d;
-        a = Integer.parseInt(ss[0]);
-        b = Integer.parseInt(ss[1]);
-        c = Integer.parseInt(ss[2]);
-        d = Integer.parseInt(ss[3]);
-        return (a << 24) | (b << 16) | (c << 8) | d;
+        int result = 0;
+        if (ip == null) {
+            return result;
+        }
+
+        // ip地址长度
+        int len = ip.length();
+        // 临时存储数字
+        int num = 0;
+        // 点号间256进制
+        int offset = 24;
+        // ip包含点的个数
+        for (int i = 0; i < len; i++) {
+            char c = ip.charAt(i);
+            switch (c) {
+                case '.':
+                    if (num < 0 || num > 255) {
+                        throw new RuntimeException("ip数字错误！");
+                    }
+                    result += (num << offset);
+                    num = 0;
+                    offset -= 8;
+                    break;
+                default:
+                    // char 转成数字
+                    int tmp = c - '0';
+                    if (tmp > -1 && tmp < 10) {
+                        num = (num * 10) + tmp;
+                    } else {
+                        throw new RuntimeException("ip包含非法字符！");
+                    }
+                    break;
+            }
+        }
+
+        // ip必须包含3个"." 并且ip的最后位必须大于等于0小于256
+        if (offset == 0 && num > -1 && num < 256) {
+            result += num;
+        } else {
+            throw new RuntimeException("ip地址格式错误！");
+        }
+
+        return result;
     }
 
     private static long ip2long(String ip)  {
