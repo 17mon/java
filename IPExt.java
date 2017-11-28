@@ -64,7 +64,7 @@ public class IPExt {
             tmpInt = int2long(indexBuffer.getInt(start));
             if (tmpInt >= ip2long_value) {
                 index_offset = bytesToLong(b, indexBuffer.get(start + 6), indexBuffer.get(start + 5), indexBuffer.get(start + 4));
-                index_length = (0xFF & indexBuffer.get(start + 7) << 8) + (0xFF & indexBuffer.get(start + 8));
+                index_length = ((0xFF & indexBuffer.get(start + 7)) << 8) + (0xFF & indexBuffer.get(start + 8));
                 break;
             }
         }
