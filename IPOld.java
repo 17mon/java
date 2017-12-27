@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-class IP {
+class IPOld {
 
     public static String randomIp() {
         Random r = new Random();
@@ -72,48 +72,21 @@ class IP {
         }
     }
 
-    private static int quickFindInIndexBuffer(long ip2long_value, int start, int end) {
-        while(true){
-            int middle = (start + end) / 2;
-            middle = middle & 0xFFFFFFF8;
-            if (middle <= start) return end;
-            long middleValue = int2long(indexBuffer.getInt(middle));
-            if (middleValue == ip2long_value) {
-                return middle;
-            } else if (middleValue > ip2long_value) {
-                if (middle + 8 == end) {
-                    return middle;
-                }
-                end = middle;
-            } else {
-                if (middle + 8 == end) {
-                    return end;
-                }
-                start = middle;
-            }
-        }
-    }
-
     public static String[] find(String ip) {
+        int ip_prefix_value = new Integer(ip.substring(0, ip.indexOf(".")));
         long ip2long_value  = ip2long(ip);
-        int ip_prefix_value = ((int)ip2long_value >> 24) & 0xFF;
         int start = index[ip_prefix_value];
         int max_comp_len = offset - 1028;
-        if(ip_prefix_value < index.length-1) {
-          max_comp_len = index[ip_prefix_value+1] * 8 + 1024;
-        }
         long index_offset = -1;
         int index_length = -1;
         byte b = 0;
-
-        int index = start * 8 + 1024;
-        if (int2long(indexBuffer.getInt(index)) < ip2long_value) {
-            index = quickFindInIndexBuffer(ip2long_value, index, max_comp_len);
+        for (start = start * 8 + 1024; start < max_comp_len; start += 8) {
+            if (int2long(indexBuffer.getInt(start)) >= ip2long_value) {
+                index_offset = bytesToLong(b, indexBuffer.get(start + 6), indexBuffer.get(start + 5), indexBuffer.get(start + 4));
+                index_length = 0xFF & indexBuffer.get(start + 7);
+                break;
+            }
         }
-        index_offset = bytesToLong(b, indexBuffer.get(index + 6), indexBuffer.get(index + 5), indexBuffer.get(index + 4));
-        index_length = 0xFF & indexBuffer.get(index + 7);
-        if (index_length <= 0)
-            return new String[0];
 
         byte[] areaBytes;
 
