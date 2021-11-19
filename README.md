@@ -1,17 +1,23 @@
-java
-====
+This project includes a brief summary of code review in a Java repository forked from a 
+GitHub public repository.
+This code was developed 7 years ago and includes a base code in Java version 4 that
+works in J2SE 1.4.
+As part of our project, we will be focusing on features of clean code:
+1. Documentation: Repository being old has no underlying description. Project demands navigation 
+   through class to understand its purpose. We will be adding comments and documentation for 
+   enhanced readability.
+2. Refactor: Base code requires immense refactoring to include good coding practices. 
+   Issues of naming conventions (meaningful names), refactoring methods (functions), formatting and 
+   error handling will be closed.
 
-17mon IP库解析代码
+Background Information:
 
-##基本用法
-```java
+GIT repository forked: https://github.com/darkice1/17mon.git
+Contributor: darkice1
+Project Name: 17mon IP Parser
+Description: IP Parser inputs IP library and parses it for the end user.
+Language: Java
+Version: Java 4
+Created Date: Dec 2, 2014
+                                                                           
 
-IP.enableFileWatch = true; // 默认值为：false，如果为true将会检查ip库文件的变化自动reload数据
-
-IP.load("IP库本地绝对路径");
-
-IP.find("8.8.8.8");//返回字符串数组["GOOGLE","GOOGLE"]
-
-```
-
-IPExt的用法与IP的用法相同，只是用来解析datx格式文件。
