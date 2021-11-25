@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class IPExt {
     public static void main(String[] args) {
-        IPExt.load("H:\\loveapp\\codebase\\17mon\\17monipdb.datx");
+        IPExt.load("./17monipdb.datx");
 
         System.out.println(Arrays.toString(IPExt.find("8.8.8.8")));
         System.out.println(Arrays.toString(IPExt.find("118.28.8.8")));

@@ -1,3 +1,4 @@
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,22 +11,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+
 class IP
 {
 
-	public static void main(String[] args)
-	{
-		IP.load("/Users/Neo/Desktop/17monipdb.dat");
-		System.out.println("find:"+Arrays.toString(IP.find("213.255.193.25")));
-		System.out.println("find2:"+Arrays.toString(IP.find2("213.255.193.25")));
-	}
-
-	public static boolean enableFileWatch = false;
-
-	
-	private static List<IpBean> iplist = new ArrayList<IpBean>();
-
-	
 	private static int offset;
 	private static int[] index = new int[256];
 	private static ByteBuffer dataBuffer;
@@ -33,14 +22,31 @@ class IP
 	private static Long lastModifyTime = 0L;
 	private static File ipFile;
 	private static ReentrantLock lock = new ReentrantLock();
+    private static List<IpBean> iplist = new ArrayList<IpBean>();
+
+
+
+
+	public static void main(String[] args)
+	{
+		IP.load("./17monipdb.dat");
+		System.out.println("find:"+Arrays.toString(IP.find(Constants.IP_ADDRESS)));
+		System.out.println("find2:"+Arrays.toString(IP.find2(Constants.IP_ADDRESS)));
+	}
+
+
 
 	public static void load(String filename)
 	{
-		ipFile = new File(filename);
-		load();
-		if (enableFileWatch)
+		try {
+			ipFile = new File(filename);
+			load();
+			if (Constants.enableFileWatch) {
+				watch();
+			}
+		}catch(Exception e)
 		{
-			watch();
+			e.printStackTrace();
 		}
 	}
 
@@ -52,20 +58,19 @@ class IP
 		int max_comp_len = offset - 1028;
 		long index_offset = -1;
 		int index_length = -1;
-		byte b = 0;
+		byte byteCount = 0;
+		byte[] areaBytes;
 		for (start = start * 8 + 1024; start < max_comp_len; start += 8)
 		{
 			if (int2long(indexBuffer.getInt(start)) >= ip2long_value)
 			{
-				index_offset = bytesToLong(b, indexBuffer.get(start + 6),
-								indexBuffer.get(start + 5),
-								indexBuffer.get(start + 4));
+				index_offset = bytesToLong(byteCount, indexBuffer.get(start + 6),
+						indexBuffer.get(start + 5),
+						indexBuffer.get(start + 4));
 				index_length = 0xFF & indexBuffer.get(start + 7);
 				break;
 			}
 		}
-
-		byte[] areaBytes;
 		lock.lock();
 		try
 		{
@@ -80,14 +85,17 @@ class IP
 
 		return new String(areaBytes).split("\t");
 	}
-	
+
+
+
+
 	public  static String[] find2(String ip)
 	{
 		String[]  area = null;
 		long ip2long_value = ip2long(ip);
 		
-		IpBean o = new IpBean();
-		o.startip = ip2long_value;
+		IpBean ipBean = new IpBean();
+		ipBean.startip = ip2long_value;
 		
 		int len = iplist.size()-1;
 		
@@ -97,10 +105,8 @@ class IP
 
 		while (low <= high)
 		{
-			//System.out.print(idx+ " ");
-			IpBean t = iplist.get(idx);
-			//Log.OutLog("%s %s %s",Format.long2ip(t.startip),Format.long2ip(t.endip),Format.long2ip(ip2long_value));
-			int re = t.compareTo(o);
+			IpBean tempIPBean = iplist.get(idx);
+			int re = tempIPBean.compareTo(ipBean);
 			if (re < 0)
 			{
 				low = idx+1;
@@ -111,7 +117,7 @@ class IP
 			}
 			else 
 			{
-				area = t.area;
+				area = tempIPBean.area;
 				break;
 			}
 			idx =(low+high)/2;
@@ -226,7 +232,7 @@ class IP
 			indexBuffer.order(ByteOrder.BIG_ENDIAN);
 		}
 		catch (IOException ioe)
-		{
+		{  ioe.printStackTrace();
 
 		}
 		finally
@@ -239,7 +245,7 @@ class IP
 				}
 			}
 			catch (IOException e)
-			{
+			{ e.printStackTrace();
 			}
 			lock.unlock();
 		}
@@ -277,32 +283,9 @@ class IP
 		}
 		return l;
 	}
-	
-	static class IpBean implements Comparable<IpBean>
-	{
-		long startip;
-		long endip;
-		String[] area;
-		
-		@Override
-		public int compareTo(IpBean o)
-		{
-			if (o.startip>=startip && o.startip<=endip)
-			{
-				return 0;
-			}
-			else
-			{
-				if (startip > o.startip)
-				{
-					return 1;
-				}
-				else if(startip < o.startip)
-				{
-					return -1;
-				}
-				return 0;
-			}
-		}
-	}
+
+
+
+
+
 }
