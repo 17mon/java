@@ -22,8 +22,7 @@ class IP
 	private static Long lastModifyTime = 0L;
 	private static File ipFile;
 	private static ReentrantLock lock = new ReentrantLock();
-    private static List<IpBean> iplist = new ArrayList<IpBean>();
-
+	private static List<IpBean> iplist = new ArrayList<IpBean>();
 
 
 
@@ -94,12 +93,12 @@ class IP
 	{
 		String[]  area = null;
 		long ip2long_value = ip2long(ip);
-		
+
 		IpBean ipBean = new IpBean();
 		ipBean.startip = ip2long_value;
-		
+
 		int len = iplist.size()-1;
-		
+
 		int idx = len / 2;
 		int high = len;
 		int low = 0;
@@ -107,16 +106,16 @@ class IP
 		while (low <= high)
 		{
 			IpBean tempIPBean = iplist.get(idx);
-			int re = tempIPBean.compareTo(ipBean);
-			if (re < 0)
+			int compare = tempIPBean.compareTo(ipBean);
+			if (compare < 0)
 			{
 				low = idx+1;
 			}
-			else if (re > 0)
+			else if (compare > 0)
 			{
 				high = idx-1;
 			}
-			else 
+			else
 			{
 				area = tempIPBean.area;
 				break;
@@ -143,7 +142,7 @@ class IP
 			}
 		}, 1000L, 5000L, TimeUnit.MILLISECONDS);
 	}
-	
+
 	private static void load2()
 	{
 		iplist.clear();
@@ -152,16 +151,16 @@ class IP
 		long index_offset = -1;
 		int index_length = -1;
 		byte b = 0;
-		
+
 		IpBean lastip = null;
 		for (start = start * 8 + 1024; start < max_comp_len; start += 8)
 		{
 			long startipl = int2long(indexBuffer.getInt(start));
 			index_offset = bytesToLong(b, indexBuffer.get(start + 6),
-							indexBuffer.get(start + 5),
-							indexBuffer.get(start + 4));
+					indexBuffer.get(start + 5),
+					indexBuffer.get(start + 4));
 			index_length = 0xFF & indexBuffer.get(start + 7);
-			
+
 			byte[] areaBytes;
 			lock.lock();
 			try
@@ -169,13 +168,13 @@ class IP
 				dataBuffer.position(offset + (int) index_offset - 1024);
 				areaBytes = new byte[index_length];
 				dataBuffer.get(areaBytes, 0, index_length);
-				
+
 				IpBean ipb = new IpBean();
 				ipb.endip = startipl;
 				ipb.area = new String(areaBytes).split("\t");
-				
+
 				if (lastip != null)
-				{					
+				{
 					if (Arrays.equals(ipb.area, lastip.area))
 					{
 						lastip.endip = ipb.endip;
@@ -208,7 +207,7 @@ class IP
 		try
 		{
 			dataBuffer = ByteBuffer.allocate(Long.valueOf(ipFile.length())
-							.intValue());
+					.intValue());
 			fin = new FileInputStream(ipFile);
 			int readBytesLength;
 			byte[] chunk = new byte[4096];
@@ -233,7 +232,8 @@ class IP
 			indexBuffer.order(ByteOrder.BIG_ENDIAN);
 		}
 		catch (IOException ioe)
-		{  ioe.printStackTrace();
+		{
+			ioe.printStackTrace();
 
 		}
 		finally
@@ -246,7 +246,8 @@ class IP
 				}
 			}
 			catch (IOException e)
-			{ e.printStackTrace();
+			{
+				e.printStackTrace();
 			}
 			lock.unlock();
 		}
@@ -256,17 +257,17 @@ class IP
 	private static long bytesToLong(byte a, byte b, byte c, byte d)
 	{
 		return int2long((((a & 0xff) << 24) | ((b & 0xff) << 16)
-						| ((c & 0xff) << 8) | (d & 0xff)));
+				| ((c & 0xff) << 8) | (d & 0xff)));
 	}
 
 	private static int str2Ip(String ip)
 	{
-		String[] ss = ip.split("\\.");
+		String[] splitIP = ip.split("\\.");
 		int a, b, c, d;
-		a = Integer.parseInt(ss[0]);
-		b = Integer.parseInt(ss[1]);
-		c = Integer.parseInt(ss[2]);
-		d = Integer.parseInt(ss[3]);
+		a = Integer.parseInt(splitIP[0]);
+		b = Integer.parseInt(splitIP[1]);
+		c = Integer.parseInt(splitIP[2]);
+		d = Integer.parseInt(splitIP[3]);
 		return (a << 24) | (b << 16) | (c << 8) | d;
 	}
 
